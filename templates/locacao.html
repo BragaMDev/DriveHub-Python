@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_locacao, status_carro, placa, botao_status, botao_excluir %}
+
+{% block title %}Locação #{{ loc.id }} · DriveHub{% endblock %}
+
+{% block content %}
+<a class="crumb" href="{{ url_for('veiculo_detalhe', car_id=loc.car_id) }}">← {{ loc.marca }} {{ loc.modelo }}</a>
+
+<section class="panel panel-pad">
+  <div class="page-head">
+    <div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <h1 class="h3 fw-bold m-0">Locação #{{ loc.id }}</h1>
+        {{ status_locacao(loc.status) }}
+      </div>
+      <p>{{ loc.cliente }} · {{ loc.marca }} {{ loc.modelo }}</p>
+    </div>
+    <div class="actions">
+      {{ botao_status(loc) }}
+      <a class="btn btn-sm btn-outline-ink" href="{{ url_for('locacao_editar', rental_id=loc.id) }}">
+        <i class="bi bi-pencil me-1"></i>Editar
+      </a>
+      {{ botao_excluir(url_for('locacao_excluir', rental_id=loc.id),
+                       'Excluir a locação #' ~ loc.id ~ '?', 'Excluir') }}
+    </div>
+  </div>
+
+  <dl class="info-grid">
+    <div>
+      <dt>Veículo</dt>
+      <dd>
+        <a href="{{ url_for('veiculo_detalhe', car_id=loc.car_id) }}" class="text-decoration-none">{{ loc.marca }} {{ loc.modelo }}</a>
+        <small>{{ placa(loc.placa_veiculo) }}</small>
+      </dd>
+    </div>
+    <div>
+      <dt>Cliente</dt>
+      <dd>{{ loc.cliente }}<small>{{ loc.cliente_cpf }}{% if loc.cliente_telefone %} · {{ loc.cliente_telefone }}{% endif %}</small></dd>
+    </div>
+    <div>
+      <dt>Atendente</dt>
+      <dd>{{ loc.atendente or 'Sem atendente' }}</dd>
+    </div>
+    <div>
+      <dt>Retirada</dt>
+      <dd>{{ loc.data_retirada|data_br }}</dd>
+    </div>
+    <div>
+      <dt>Devolução</dt>
+      <dd>{{ loc.data_devolucao|data_br }}</dd>
+    </div>
+    <div>
+      <dt>Período</dt>
+      <dd>{{ loc.dias }} diária(s)<small>{{ loc.valor_diario|moeda }} por dia</small></dd>
+    </div>
+  </dl>
+
+  <div class="total-box">
+    <span>Valor total da locação</span>
+    <strong>{{ loc.preco|moeda }}</strong>
+  </div>
+</section>
+{% endblock %}

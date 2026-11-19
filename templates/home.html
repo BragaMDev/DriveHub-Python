@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_locacao, placa, vazio %}
+
+{% block title %}DriveHub · Painel{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <span class="eyebrow">Painel da locadora</span>
+  <h1>Frota e locações sob controle.</h1>
+  <p>Veja quais carros estão livres, acompanhe as locações em andamento e registre uma nova em poucos cliques.</p>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('locacao_nova') }}" class="btn btn-primary btn-lg">
+      <i class="bi bi-plus-lg me-1"></i>Nova locação
+    </a>
+    <a href="{{ url_for('frota') }}" class="btn btn-outline-light btn-lg">
+      <i class="bi bi-car-front me-1"></i>Ver frota
+    </a>
+  </div>
+  <i class="bi bi-car-front-fill hero-icon"></i>
+</section>
+
+<section class="stats">
+  <a class="panel stat text-decoration-none" href="{{ url_for('frota', status='disponível') }}">
+    <span class="stat-icon ok"><i class="bi bi-check2-circle"></i></span>
+    <div>
+      <div class="stat-num">{{ resumo.disponiveis }}<small class="muted fs-6 fw-semibold"> / {{ resumo.total }}</small></div>
+      <div class="stat-label">Veículos disponíveis</div>
+    </div>
+  </a>
+  <a class="panel stat text-decoration-none" href="{{ url_for('locacoes', status='ativa') }}">
+    <span class="stat-icon info"><i class="bi bi-key"></i></span>
+    <div>
+      <div class="stat-num">{{ resumo.locacoes.ativa.qtd }}</div>
+      <div class="stat-label">Locações ativas</div>
+    </div>
+  </a>
+  <a class="panel stat text-decoration-none" href="{{ url_for('locacoes', status='pendente') }}">
+    <span class="stat-icon idle"><i class="bi bi-hourglass-split"></i></span>
+    <div>
+      <div class="stat-num">{{ resumo.locacoes.pendente.qtd }}</div>
+      <div class="stat-label">Locações pendentes</div>
+    </div>
+  </a>
+  <div class="panel stat">
+    <span class="stat-icon accent"><i class="bi bi-cash-coin"></i></span>
+    <div>
+      <div class="stat-num">{{ resumo.locacoes.concluida.total|moeda }}</div>
+      <div class="stat-label">Receita concluída</div>
+    </div>
+  </div>
+</section>
+
+{% if resumo.total %}
+<section class="panel panel-pad mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <strong>Situação da frota</strong>
+    <span class="muted small">{{ resumo.total }} veículo(s)</span>
+  </div>
+  <div class="fleet-bar" role="img" aria-label="Distribuição da frota por status">
+    <span class="ok" style="width: {{ resumo.disponiveis * 100 / resumo.total }}%"></span>
+    <span class="info" style="width: {{ resumo.alugados * 100 / resumo.total }}%"></span>
+    <span class="warn" style="width: {{ resumo.manutencao * 100 / resumo.total }}%"></span>
+  </div>
+  <div class="legend">
+    <span><i class="ok"></i>{{ resumo.disponiveis }} disponível(is)</span>
+    <span><i class="info"></i>{{ resumo.alugados }} alugado(s)</span>
+    <span><i class="warn"></i>{{ resumo.manutencao }} em manutenção</span>
+  </div>
+</section>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <section class="panel h-100">
+      <div class="panel-title">
+        <span>Últimas locações</span>
+        <a href="{{ url_for('locacoes') }}">Ver todas →</a>
+      </div>
+      {% if recentes %}
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>#</th><th>Veículo</th><th>Cliente</th><th>Retirada</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for l in recentes %}
+            <tr>
+              <td><a class="id" href="{{ url_for('locacao_detalhe', rental_id=l.id) }}">#{{ l.id }}</a></td>
+              <td>{{ l.marca }} {{ l.modelo }}<span class="sub">{{ l.placa_veiculo }}</span></td>
+              <td>{{ l.cliente }}</td>
+              <td>{{ l.data_retirada|data_br }}</td>
+              <td>{{ status_locacao(l.status) }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        {{ vazio('bi-calendar-x', 'Nenhuma locação ainda', 'Registre a primeira locação para ela aparecer aqui.') }}
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="col-lg-5">
+    <section class="panel h-100">
+      <div class="panel-title">
+        <span>Disponíveis agora</span>
+        <a href="{{ url_for('frota', status='disponível') }}">Ver todos →</a>
+      </div>
+      {% for c in disponiveis %}
+      <div class="d-flex align-items-center justify-content-between gap-2 px-3 py-3 {{ 'border-top' if not loop.first }}">
+        <div>
+          <a class="fw-bold text-decoration-none text-dark" href="{{ url_for('veiculo_detalhe', car_id=c.id) }}">{{ c.marca }} {{ c.modelo }}</a>
+          <div class="muted small">{{ c.categoria or '—' }} · {{ c.valor_diario|moeda }}/dia</div>
+        </div>
+        <a class="btn btn-sm btn-outline-ink" href="{{ url_for('locacao_nova', car_id=c.id) }}">Alugar</a>
+      </div>
+      {% else %}
+        {{ vazio('bi-car-front', 'Nenhum veículo livre', 'Todos estão alugados ou em manutenção.') }}
+      {% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

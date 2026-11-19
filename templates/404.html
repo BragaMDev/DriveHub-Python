@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "_macros.html" import vazio %}
+
+{% block title %}Página não encontrada · DriveHub{% endblock %}
+
+{% block content %}
+<div class="panel">
+  {% call vazio('bi-signpost-split', 'Página não encontrada', 'O endereço não existe ou o registro foi removido.') %}
+    <a class="btn btn-primary mt-3" href="{{ url_for('index') }}">Voltar ao início</a>
+  {% endcall %}
+</div>
+{% endblock %}

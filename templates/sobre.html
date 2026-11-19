@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}DriveHub · Sobre o projeto{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="page-head">
+      <div>
+        <h2>Sobre o DriveHub</h2>
+        <p>Sistema acadêmico de gerenciamento de locadora de veículos.</p>
+      </div>
+    </div>
+
+    <section class="panel panel-pad mb-4">
+      <h3 class="h5 fw-bold mb-2">O propósito do projeto</h3>
+      <p class="muted mb-0">
+        O <strong class="text-dark">DriveHub</strong> foi desenvolvido como projeto prático acadêmico com
+        <strong class="text-dark">Flask</strong>, <strong class="text-dark">Jinja2</strong> e
+        <strong class="text-dark">SQLite</strong>. Ele controla a frota, os clientes e as locações, mantendo o
+        status de cada veículo sempre coerente com o que está acontecendo.
+      </p>
+    </section>
+
+    <section class="panel panel-pad mb-4">
+      <h3 class="h5 fw-bold mb-3">O que o sistema faz</h3>
+      <div class="row g-4">
+        <div class="col-md-6 feature">
+          <i class="bi bi-car-front"></i>
+          <div><h3>Frota</h3><p>Cadastro, edição, busca e filtros por categoria e status.</p></div>
+        </div>
+        <div class="col-md-6 feature">
+          <i class="bi bi-calendar-check"></i>
+          <div><h3>Locações</h3><p>Criação, edição, detalhe, início, conclusão e exclusão.</p></div>
+        </div>
+        <div class="col-md-6 feature">
+          <i class="bi bi-kanban"></i>
+          <div><h3>Quadro por veículo</h3><p>Locações agrupadas por status, com quantidade e total em reais (GROUP BY).</p></div>
+        </div>
+        <div class="col-md-6 feature">
+          <i class="bi bi-speedometer2"></i>
+          <div><h3>Painel</h3><p>Números da frota e das locações logo na página inicial.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel-pad mb-4">
+      <h3 class="h5 fw-bold mb-3">Regras de negócio</h3>
+      <ul class="muted mb-0 d-grid gap-2">
+        <li>Um veículo não pode ter duas locações no mesmo período.</li>
+        <li>Veículos em manutenção não podem ser alugados.</li>
+        <li>O cliente precisa ter habilitação cadastrada.</li>
+        <li>A devolução deve ser depois da retirada; o preço é <em>diárias × valor da diária</em>.</li>
+        <li>Iniciar uma locação marca o carro como alugado; concluir (ou excluir) libera o carro.</li>
+      </ul>
+    </section>
+
+    <section class="panel panel-pad">
+      <h3 class="h5 fw-bold mb-3">Tecnologias</h3>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="tech"><i class="bi bi-filetype-py"></i>Python / Flask</span>
+        <span class="tech"><i class="bi bi-code-slash"></i>Jinja2</span>
+        <span class="tech"><i class="bi bi-database"></i>SQLite</span>
+        <span class="tech"><i class="bi bi-bootstrap"></i>Bootstrap 5</span>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{# Peças reaproveitadas em várias telas. Uso: {% from "_macros.html" import status_carro %} #}
+
+{% macro status_carro(s) -%}
+  {%- set tom = {'disponível': 'ok', 'alugado': 'info', 'manutenção': 'warn'}.get(s, 'idle') -%}
+  {%- set rotulo = {'disponível': 'Disponível', 'alugado': 'Alugado', 'manutenção': 'Manutenção'}.get(s, s) -%}
+  <span class="chip chip-{{ tom }}">{{ rotulo }}</span>
+{%- endmacro %}
+
+{% macro status_locacao(s) -%}
+  {%- set tom = {'pendente': 'idle', 'ativa': 'info', 'concluida': 'ok'}.get(s, 'idle') -%}
+  {%- set rotulo = {'pendente': 'Pendente', 'ativa': 'Ativa', 'concluida': 'Concluída'}.get(s, s) -%}
+  <span class="chip chip-{{ tom }}">{{ rotulo }}</span>
+{%- endmacro %}
+
+{% macro placa(p) -%}
+  <span class="placa"><span class="placa-top">BRASIL</span><span class="placa-num">{{ p }}</span></span>
+{%- endmacro %}
+
+{% macro icone_carro(categoria) -%}
+  {{ 'bi-truck-front-fill' if categoria == 'Picape' else 'bi-car-front-fill' }}
+{%- endmacro %}
+
+{# Botão que leva a locação para o próximo status (pendente -> ativa -> concluída) #}
+{% macro botao_status(loc) -%}
+  {%- if loc.status == 'pendente' -%}
+    <form method="post" action="{{ url_for('locacao_mover', rental_id=loc.id) }}" class="d-inline">
+      <input type="hidden" name="status" value="ativa">
+      <button class="btn btn-sm btn-primary" title="Cliente retirou o veículo">
+        <i class="bi bi-play-fill"></i> Iniciar
+      </button>
+    </form>
+  {%- elif loc.status == 'ativa' -%}
+    <form method="post" action="{{ url_for('locacao_mover', rental_id=loc.id) }}" class="d-inline">
+      <input type="hidden" name="status" value="concluida">
+      <button class="btn btn-sm btn-success" title="Cliente devolveu o veículo">
+        <i class="bi bi-check-lg"></i> Concluir
+      </button>
+    </form>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro botao_excluir(url, pergunta, texto='') -%}
+  <form method="post" action="{{ url }}" class="d-inline"
+        onsubmit='return confirm({{ pergunta|tojson }})'>
+    <button class="btn btn-sm btn-soft-danger" title="Excluir">
+      <i class="bi bi-trash"></i>{% if texto %} {{ texto }}{% endif %}
+    </button>
+  </form>
+{%- endmacro %}
+
+{% macro vazio(icone, titulo, texto='') -%}
+  <div class="empty">
+    <i class="bi {{ icone }}"></i>
+    <h3>{{ titulo }}</h3>
+    {% if texto %}<p class="mb-0">{{ texto }}</p>{% endif %}
+    {{ caller() if caller is defined }}
+  </div>
+{%- endmacro %}

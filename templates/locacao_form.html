@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ('Editar locação #' ~ locacao.id) if locacao else 'Nova locação' }} · DriveHub{% endblock %}
+
+{% block content %}
+<a class="crumb" href="{{ url_for('locacao_detalhe', rental_id=locacao.id) if locacao else url_for('locacoes') }}">
+  ← {{ ('Locação #' ~ locacao.id) if locacao else 'Locações' }}
+</a>
+<div class="page-head">
+  <div>
+    <h2>{{ ('Editar locação #' ~ locacao.id) if locacao else 'Nova locação' }}</h2>
+    <p>O preço é calculado automaticamente: diárias × valor da diária do veículo.</p>
+  </div>
+</div>
+
+{# valores: o que veio do formulário (POST), da locação (edição) ou do ?car_id= #}
+{% set f = valores %}
+{% set rotulos = {'pendente': 'Pendente', 'ativa': 'Ativa (retirou agora)', 'concluida': 'Concluída'} %}
+<form method="post" class="panel panel-pad">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label" for="car_id">Veículo</label>
+      <select class="form-select" name="car_id" id="car_id" required>
+        <option value="">Selecione…</option>
+        {% for c in carros %}
+        <option value="{{ c.id }}" data-valor="{{ c.valor_diario }}"
+                {{ 'selected' if f.car_id|string == c.id|string }}>
+          {{ c.marca }} {{ c.modelo }} ({{ c.placa_veiculo }}) · {{ c.valor_diario|moeda }}/dia · {{ c.status }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label" for="customer_id">Cliente</label>
+      <select class="form-select" name="customer_id" id="customer_id" required>
+        <option value="">Selecione…</option>
+        {% for cu in clientes %}
+        <option value="{{ cu.id }}" {{ 'selected' if f.customer_id|string == cu.id|string }}>
+          {{ cu.nome }} · {{ cu.cpf }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label" for="data_retirada">Retirada</label>
+      <input class="form-control" type="date" name="data_retirada" id="data_retirada" required
+             value="{{ f.data_retirada or '' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="data_devolucao">Devolução</label>
+      <input class="form-control" type="date" name="data_devolucao" id="data_devolucao" required
+             value="{{ f.data_devolucao or '' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="employee_id">Atendente</label>
+      <select class="form-select" name="employee_id" id="employee_id">
+        <option value="">— nenhum —</option>
+        {% for e in atendentes %}
+        <option value="{{ e.id }}" {{ 'selected' if f.employee_id|string == e.id|string }}>
+          {{ e.nome }} ({{ e.cargo }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="status">Status</label>
+      <select class="form-select" name="status" id="status">
+        {% for s in statuses %}
+        <option value="{{ s }}" {{ 'selected' if (f.status or 'pendente') == s }}>{{ rotulos[s] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="preview" id="previa"></div>
+
+  <div class="d-flex gap-2 align-items-center mt-4">
+    <button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Salvar locação</button>
+    <a class="btn btn-link"
+       href="{{ url_for('locacao_detalhe', rental_id=locacao.id) if locacao else url_for('locacoes') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Prévia do preço: dias x diária (o servidor recalcula ao salvar)
+  const carro = document.getElementById("car_id");
+  const ini = document.getElementById("data_retirada");
+  const fim = document.getElementById("data_devolucao");
+  const previa = document.getElementById("previa");
+  const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+  function atualizar() {
+    const valor = parseFloat(carro.selectedOptions[0]?.dataset.valor);
+    const dias = Math.round((new Date(fim.value) - new Date(ini.value)) / 86400000);
+    if (!valor || !(dias > 0)) { previa.style.display = "none"; return; }
+    previa.textContent = dias + " diária(s) × " + brl.format(valor) + " = " + brl.format(dias * valor);
+    previa.style.display = "block";
+  }
+  [carro, ini, fim].forEach(el => el.addEventListener("change", atualizar));
+  atualizar();
+</script>
+{% endblock %}

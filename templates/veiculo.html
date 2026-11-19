@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_carro, status_locacao, placa, icone_carro, botao_status, botao_excluir %}
+
+{% block title %}{{ carro.marca }} {{ carro.modelo }} · DriveHub{% endblock %}
+
+{% block content %}
+<a class="crumb" href="{{ url_for('frota') }}">← Frota</a>
+
+<section class="panel car-hero">
+  <div class="big-icon"><i class="bi {{ icone_carro(carro.categoria) }}"></i></div>
+  <div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <h1 class="h3 fw-bold m-0">{{ carro.marca }} {{ carro.modelo }}</h1>
+      {{ status_carro(carro.status) }}
+    </div>
+    <div class="mt-2">{{ placa(carro.placa_veiculo) }}</div>
+  </div>
+  <div class="facts">
+    <div class="fact"><small>Ano</small><b>{{ carro.ano or '—' }}</b></div>
+    <div class="fact"><small>Categoria</small><b>{{ carro.categoria or '—' }}</b></div>
+    <div class="fact"><small>Diária</small><b>{{ carro.valor_diario|moeda }}</b></div>
+  </div>
+</section>
+
+<div class="page-head">
+  <h2 class="h4 fw-bold m-0">Locações do veículo</h2>
+  <div class="actions">
+    {% if carro.status != 'manutenção' %}
+    <a class="btn btn-primary" href="{{ url_for('locacao_nova', car_id=carro.id) }}">
+      <i class="bi bi-plus-lg me-1"></i>Nova locação
+    </a>
+    {% endif %}
+    <a class="btn btn-outline-ink" href="{{ url_for('veiculo_editar', car_id=carro.id) }}">
+      <i class="bi bi-pencil me-1"></i>Editar
+    </a>
+    {{ botao_excluir(url_for('veiculo_excluir', car_id=carro.id),
+                     'Excluir este veículo e TODAS as locações dele?', 'Excluir') }}
+  </div>
+</div>
+
+<form method="get" class="panel filters">
+  <input class="form-control grow" name="q" value="{{ q }}" placeholder="Buscar pelo nome do cliente">
+  <select class="form-select" name="status">
+    <option value="">todos os status</option>
+    {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|capitalize }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-dark"><i class="bi bi-funnel me-1"></i>Filtrar</button>
+  {% if q or status %}<a class="btn btn-link" href="{{ url_for('veiculo_detalhe', car_id=carro.id) }}">Limpar</a>{% endif %}
+</form>
+
+<div class="board">
+  {% for s in statuses if not status or status == s %}
+  <section class="col">
+    <div class="col-head">
+      <h4>{{ {'pendente': 'Pendentes', 'ativa': 'Ativas', 'concluida': 'Concluídas'}[s] }}</h4>
+      <small>{{ stats[s].qtd }} · {{ stats[s].total|moeda }}</small>
+    </div>
+
+    {% for l in locacoes if l.status == s %}
+    <div class="rental-card s-{{ l.status }}">
+      <a class="title" href="{{ url_for('locacao_detalhe', rental_id=l.id) }}">#{{ l.id }} · {{ l.cliente }}</a>
+      <div class="meta">
+        <span><i class="bi bi-calendar3"></i> {{ l.data_retirada|data_br }} → {{ l.data_devolucao|data_br }}</span>
+        <span><i class="bi bi-cash"></i> {{ l.preco|moeda }}</span>
+        <span><i class="bi bi-person-badge"></i> {{ l.atendente or 'sem atendente' }}</span>
+      </div>
+      {% if l.status != 'concluida' %}
+      <div class="move">{{ botao_status(l) }}</div>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="col-empty">Nenhuma locação aqui.</div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

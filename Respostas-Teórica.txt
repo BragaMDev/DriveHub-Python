@@ -1,0 +1,12 @@
+5. Defesa Teórica
+Durante a entrega ou apresentação desta fase, o grupo precisará demonstrar domínio teórico sobre as decisões tomadas, sabendo explicar:
+
+1. Qual a diferença entre usar um JOIN (Inner Join) e um LEFT JOIN na hora de exibir os dados na tela?
+
+R: O INNER JOIN mostra apenas os registros que têm correspondência nas duas tabelas, já o LEFT JOIN mostra só os registros da tabela da esquerda, mesmo que não tenha correspondência
+
+2. No relacionamento 1:N criado pelo grupo, o que acontece se o registro principal for apagado? Explicar a diferença entre configurar a chave estrangeira com ON DELETE CASCADE e ON DELETE SET NULL.
+
+R: Quando o registro principal é apagado, geralmente o banco de dados evita a exclusão caso ele tenha registros filhos, os comandos ON DELETE CASCADE apaga 
+automaticamente todos os registros filhos caso o pai seja excluído e o ON DELETE SET NULL mantem os registros filhos, mas muda para o valor para NULL
+

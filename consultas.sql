@@ -1,0 +1,21 @@
+SELECT
+    id,
+    marca,
+    modelo,
+    ano,
+    categoria,
+    valor_diario,
+    placa_veiculo,
+    status
+FROM
+    cars;
+
+SELECT
+    id,
+    nome,
+    email,
+    telefone,
+    cpf,
+    habilitacao
+FROM
+    customers;

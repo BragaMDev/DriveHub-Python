@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar veículo' if carro else 'Novo veículo' }} · DriveHub{% endblock %}
+
+{% block content %}
+<a class="crumb" href="{{ url_for('veiculo_detalhe', car_id=carro.id) if carro else url_for('frota') }}">
+  ← {{ (carro.marca ~ ' ' ~ carro.modelo) if carro else 'Frota' }}
+</a>
+<div class="page-head">
+  <h2>{{ 'Editar veículo' if carro else 'Novo veículo' }}</h2>
+</div>
+
+{% set f = valores %}
+<form method="post" class="panel panel-pad" novalidate>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label" for="marca">Marca</label>
+      <input class="form-control" id="marca" name="marca" required value="{{ f.marca or '' }}">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label" for="modelo">Modelo</label>
+      <input class="form-control" id="modelo" name="modelo" required value="{{ f.modelo or '' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="ano">Ano</label>
+      <input class="form-control" id="ano" type="number" name="ano" min="1990" value="{{ f.ano or '' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="categoria">Categoria</label>
+      <input class="form-control" id="categoria" name="categoria" list="lista-categorias"
+             placeholder="Sedan, SUV, Hatch…" value="{{ f.categoria or '' }}">
+      <datalist id="lista-categorias">
+        {% for c in categorias %}<option value="{{ c }}">{% endfor %}
+      </datalist>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="valor_diario">Diária (R$)</label>
+      <input class="form-control" id="valor_diario" name="valor_diario" inputmode="decimal" required
+             value="{{ f.valor_diario or '' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="placa_veiculo">Placa</label>
+      <input class="form-control text-uppercase" id="placa_veiculo" name="placa_veiculo" maxlength="8"
+             placeholder="ABC1D23" required value="{{ f.placa_veiculo or '' }}">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label" for="status">Status</label>
+      <select class="form-select" id="status" name="status">
+        {% for s in statuses %}
+        <option value="{{ s }}" {{ 'selected' if (f.status or 'disponível') == s }}>{{ s|capitalize }}</option>
+        {% endfor %}
+      </select>
+      {% if 'alugado' in statuses %}
+      <div class="form-text">“Alugado” é controlado pelas locações: conclua a locação ativa para liberar o carro.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 align-items-center mt-4">
+    <button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Salvar</button>
+    <a class="btn btn-link" href="{{ url_for('veiculo_detalhe', car_id=carro.id) if carro else url_for('frota') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

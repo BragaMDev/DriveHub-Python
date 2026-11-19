@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_carro, placa, icone_carro, vazio %}
+
+{% block title %}DriveHub · Frota{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h2>Frota</h2>
+    <p>{{ veiculos|length }} veículo(s){{ ' encontrado(s)' if q or status or categoria }} · diárias e situação atual.</p>
+  </div>
+  <div class="actions">
+    <a href="{{ url_for('veiculo_novo') }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Novo veículo
+    </a>
+  </div>
+</div>
+
+<form method="get" class="panel filters">
+  <input class="form-control grow" name="q" value="{{ q }}" placeholder="Buscar por marca, modelo ou placa">
+  <select class="form-select" name="categoria">
+    <option value="">todas as categorias</option>
+    {% for c in categorias %}<option {{ 'selected' if c == categoria }}>{{ c }}</option>{% endfor %}
+  </select>
+  <select class="form-select" name="status">
+    <option value="">todos os status</option>
+    {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|capitalize }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-dark"><i class="bi bi-funnel me-1"></i>Filtrar</button>
+  {% if q or status or categoria %}
+  <a class="btn btn-link" href="{{ url_for('frota') }}">Limpar</a>
+  {% endif %}
+</form>
+
+{% if veiculos %}
+<div class="car-grid">
+  {% for v in veiculos %}
+  <article class="panel car-card">
+    <div class="car-top">
+      <i class="bi {{ icone_carro(v.categoria) }}"></i>
+      {{ status_carro(v.status) }}
+    </div>
+    <div class="car-body">
+      <div class="car-brand">{{ v.marca }}{% if v.categoria %} · {{ v.categoria }}{% endif %}</div>
+      <h3 class="car-name">{{ v.modelo }}</h3>
+      <div class="car-meta">
+        <span>{{ v.ano or '—' }}</span>
+        {{ placa(v.placa_veiculo) }}
+      </div>
+      <div class="price">{{ v.valor_diario|moeda }} <small>/ dia</small></div>
+    </div>
+    <div class="car-actions">
+      <a href="{{ url_for('veiculo_detalhe', car_id=v.id) }}" class="btn btn-outline-ink btn-sm">Detalhes</a>
+      {% if v.status == 'disponível' %}
+      <a href="{{ url_for('locacao_nova', car_id=v.id) }}" class="btn btn-primary btn-sm">Alugar</a>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="panel">
+  {% call vazio('bi-search', 'Nenhum veículo encontrado', 'Tente outro filtro ou cadastre um novo veículo.') %}{% endcall %}
+</div>
+{% endif %}
+{% endblock %}
