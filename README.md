@@ -23,16 +23,16 @@ O **DriveHub** é uma aplicação web voltada ao controle operacional de uma loc
 
 ```text
 DriveHub-Python/
-├── app.py                  # Rotas e lógica principal da aplicação Flask
-├── db_sql.py               # Camada de conexão e operações com o banco de dados
-├── executar.py             # Script auxiliar de execução da aplicação
-├── drivehub.db             # Banco de dados SQLite
-├── schema.sql              # Definição das tabelas e estrutura relacional
-├── inclusoes.sql           # Scripts de inserção de dados iniciais
-├── alteracoes.sql          # Scripts de alterações estruturais/dados
-├── consultas.sql           # Consultas SQL
-├── requirements.txt        # Dependências do projeto
-├── Respostas-Teórica.txt   # Notas e respostas teóricas do projeto
+├── app.py                  
+├── db_sql.py               
+├── executar.py             
+├── drivehub.db            
+├── schema.sql             
+├── inclusoes.sql           
+├── alteracoes.sql          
+├── consultas.sql           
+├── requirements.txt        
+├── Respostas-Teórica.txt  
 ├── static/
 │   ├── DriveHub Favicon.png
 │   └── style.css
